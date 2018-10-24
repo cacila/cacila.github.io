@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style type="text/css">
+td{
+   height:30px;
+   width: 30px;
+   color:blue;
+   background-color:blue;
+   border:1px solid black;
+}	
+td.thunder{
+	background-color: #eee;
+	color:#eee;
+}
+td.mark{
+	background-color: #afe;
+	color:#afe;
+}
+td.clicked_safe{
+	background-color:white;
+	color:black;
+}
+td.clicked_mine{
+	background:red;
+}
+td:hover{
+	background-color: #fea;
+	color:#fea;
+}
+li:hover{
+	background-color: #fee;
+}
+li:active{
+	background-color: #eee;
+}
+</style>
+<head>
+<body>
+<h1>MineThunder</h1>
+<p>which level do you chose</p>
+<ul>
+	<li>low</li>
+	<li>middle</li>
+	<li>high</li>
+</ul> 
+<p></p>
+<p></p>
+<table></table>
+</body>
+<script>
+var Mine_list=[];
+var row,column,num_thunder;
+var flag=0;
+window.onload=function(){
+	window.oncontextmenu=function(e){e.preventDefault();}
+	var li_list = document.querySelectorAll('li');
+	var num_mart_count=0;
+	var p2 = document.querySelectorAll('p')[2];
+	var p1 = document.querySelectorAll('p')[1];
+	for(var i=0;i<3;i++){
+		li_list[i].addEventListener('click',function(event){
+			event.preventDefault();
+			if(event.target.textContent=='low'){
+				row=9;column=9;num_thunder=10;
+			}
+			else if(event.target.textContent=='middle'){
+				row=16;column=16;num_thunder=40;
+			}
+			else{
+				row=16;column=30;num_thunder=99;
+			}
+			p2.textContent='Marks Count:'+0;
+			p1.textContent='Mines Count:'+num_thunder;
+			var sum = row * column;
+			var count = 0;
+			for (var x=0;x<sum;x++){
+				Mine_list[x]=0;
+			}
+			while(true){
+				Mine_list[parseInt(Math.random()*sum)]=1;
+				count++;
+				if(count>=num_thunder){
+					if(Mine_list.reduce((x,y)=>{return x+y;})==num_thunder) break;
+				}
+			}
+			var table = document.querySelector('table');
+			var body = document.querySelector('body');
+			body.removeChild(table);
+			table = document.createElement(
+				'table');
+			for(var x=0;x<row;x++){
+				var tr=document.createElement('tr');
+				for(var y=0;y<column;y++){
+					var td=document.createElement('td');
+					tr.appendChild(td);
+				}
+				table.appendChild(tr);
+				body.appendChild(table);
+			}
+			var sum=column*row;
+			var x=column,y=row,count=0;
+			var nodelist=document.querySelectorAll('td');
+			for (var i =0;i<sum;i++){
+				count=0;
+				if((i+1)%x!=0){
+					count +=Mine_list[i+1];
+				}
+				if((i-1+x)%x!=x-1){
+					count +=Mine_list[i-1];
+				}
+				if((i+x)<x*y){
+					count +=Mine_list[i+x];
+				}
+				if((i-x)>=0){
+					count +=Mine_list[i-x];
+				}
+				if((i-x)>=0&&(i+1)%x!=0){
+					count +=Mine_list[i-x+1];
+				}
+				if((i-x)>=0&&(i-1+x)%x!=x-1){
+					count +=Mine_list[i-x-1];
+				}
+				if((i+x)<x*y&&(i+1)%x!=0){
+					count +=Mine_list[i+x+1];
+				}
+				if((i+x)<x*y&&(i-1+x)%x!=x-1){
+					count +=Mine_list[i+x-1];
+				}
+				if(count!=0)
+					nodelist[i].textContent=String(count);
+			nodelist[i].addEventListener('mousedown',function(event){
+			if(flag==1){
+				if(event.button==2)
+					flag=3;
+			}
+			else if(event.button==2) {
+				flag=2;
+			}
+			if(flag==2){
+				if(event.button== 0) flag=3;
+			}
+			else if(event.button==0){ 
+				flag=1;
+			} 
+			
+			if(flag==3){
+				for(var j =0;j<sum;j++){
+					if (nodelist[j]==event.target){var result=j;}
+				}
+				if(nodelist[result]=='') nodelist[result] ='thunder';
+				if((result+1)%x!=0){
+					if(nodelist[result+1].className=='')
+						nodelist[result+1].className='thunder';
+				}
+				if((result-1+x)%x!=x-1){
+					if(nodelist[result-1].className=='')
+					nodelist[result-1].className='thunder';
+				}
+				if((result+x)<x*y){
+					if(nodelist[result+x].className=='')
+					 nodelist[result+x].className='thunder';
+				}
+				if((result-x)>=0){
+					if(nodelist[result-x].className=='')
+						nodelist[result-x].className='thunder';
+				}
+				if((result-x)>=0&&(result+1)%x!=0){
+					if(nodelist[result-x+1].className=='')
+						nodelist[result-x+1].className='thunder';
+				}
+				if((result-x)>=0&&(result-1+x)%x!=x-1){
+					if(nodelist[result-x-1].className=='')
+						nodelist[result-x-1].className='thunder';
+				}
+				if((result+x)<x*y&&(result+1)%x!=0){
+					if(nodelist[result+x+1].className=='')
+						nodelist[result+x+1].className='thunder';
+				}
+				if((result+x)<x*y&&(result-1+x)%x!=x-1){
+					if(nodelist[result+x-1].className=='')
+						nodelist[result+x-1].className='thunder';
+				}
+			}
+		});
+		nodelist[i].addEventListener('mouseup',function(event){
+			//find the positon of element
+			for(var j =0;j<sum;j++){
+				if (nodelist[j]==event.target){var result=j;}
+			}
+			if(flag==1) {				
+				if(nodelist[result].className==''){
+					if(Mine_list[result]==0){
+						nodelist[result].className='clicked_safe';
+						click_reaction(event.target,nodelist,result);
+					}
+					else{
+						nodelist[result].className='clicked_mine';
+						alert('you lose');
+					}
+				}				
+			}
+			if(flag==2) {
+				if(nodelist[result].className==''){ 
+					nodelist[result].className='mark';
+					num_mart_count++;
+					if(Mine_list[result]==1) num_thunder--;
+				}
+				else if(nodelist[result].className=='mark'){
+					nodelist[result].className=''
+					num_mart_count--;
+					if(Mine_list[result]==1) num_thunder++;
+				}
+				p2.textContent='Marks Count:'+num_mart_count;
+			}
+			if(flag==3) {
+				var mark_num=0;
+				var mine_num=0;
+				//check the markNumber equal the mineNumber
+				if((result+1)%x!=0){
+					if(nodelist[result+1].className=='mark'){
+						mark_num+=1;
+					}
+					mine_num+=Mine_list[result+1];
+				}
+				if((result-1+x)%x!=x-1){
+					if(nodelist[result-1].className=='mark'){
+						mark_num+=1;
+					}
+					mine_num+=Mine_list[result-1];
+				}
+				if((result+x)<x*y){
+					if(nodelist[result+x].className=='mark'){
+						mark_num+=1;
+					}
+					mine_num+=Mine_list[result+x];
+				}
+				if((result-x)>=0){
+					if(nodelist[result-x].className=='mark')
+						mark_num+=1;
+					mine_num+=Mine_list[result-x];
+				}
+				if((result-x)>=0&&(result+1)%x!=0){
+					if(nodelist[result-x+1].className=='mark'){
+						mark_num+=1;
+					}
+					mine_num+=Mine_list[result-x+1];
+				}
+				if((result-x)>=0&&(result-1+x)%x!=x-1){
+					if(nodelist[result-x-1].className=='mark'){
+						mark_num+=1;
+					}
+					mine_num+=Mine_list[result-x-1];
+				}
+				if((result+x)<x*y&&(result+1)%x!=0){
+					if(nodelist[result+x+1].className=='mark'){
+						mark_num+=1;
+					}
+					mine_num+=Mine_list[result+x+1];
+				}
+				if((result+x)<x*y&&(result-1+x)%x!=x-1){
+					if(nodelist[result+x-1].className=='mark'){
+						mark_num+=1;
+					}
+					mine_num+=Mine_list[result+x-1];
+				}
+				//execute the final change
+				if((result+1)%x!=0){
+					if(nodelist[result+1].className=='thunder'){
+						if((mark_num==mine_num)&&(mark_num!=0)){
+							if(Mine_list[result+1]==0){
+								nodelist[result+1].className='clicked_safe';
+								click_reaction(nodelist[result+1],nodelist,result+1);
+							}
+							else{
+								nodelist[result+1].className='clicked_mine';
+								alert('you lose!');
+								return false;
+							}
+						}
+						else{
+							nodelist[result+1].className='';
+						}
+					}
+				}
+				if((result-1+x)%x!=x-1){
+					if(nodelist[result-1].className=='thunder'){
+						if((mark_num==mine_num)&&(mark_num!=0)){
+							if(Mine_list[result-1]==0){
+								nodelist[result-1].className='clicked_safe';
+								click_reaction(nodelist[result-1],nodelist,result-1);
+							}
+							else{
+								nodelist[result-1].className='clicked_mine';
+								alert('you lose!');
+								return false;
+							}
+						}
+						else{
+							nodelist[result-1].className='';
+						}
+					}						
+				}
+				if((result+x)<x*y){
+					if(nodelist[result+x].className=='thunder'){
+						if((mark_num==mine_num)&&(mark_num!=0)){
+							if(Mine_list[result+x]==0){
+								nodelist[result+x].className='clicked_safe';
+								click_reaction(nodelist[result+x],nodelist,result+x);
+							}
+							else{
+								nodelist[result+x].className='clicked_mine';
+								alert('you lose!');
+								return false;
+							}
+						}
+						else{
+							nodelist[result+x].className='';
+						}
+					}	
+				}
+				if((result-x)>=0){
+					if(nodelist[result-x].className=='thunder'){
+						if((mark_num==mine_num)&&(mark_num!=0)){
+							if(Mine_list[result-x]==0){
+								nodelist[result-x].className='clicked_safe';
+								click_reaction(nodelist[result-x],nodelist,result-x);
+							}
+							else{
+								nodelist[result-x].className='clicked_mine';
+								alert('you lose!');
+								return false;
+							}
+						}
+						else{
+							nodelist[result-x].className='';
+						}
+					}	
+				}
+				if((result-x)>=0&&(result+1)%x!=0){
+					if(nodelist[result-x+1].className=='thunder'){
+						if((mark_num==mine_num)&&(mark_num!=0)){
+							if(Mine_list[result-x+1]==0){
+								nodelist[result-x+1].className='clicked_safe';
+								click_reaction(nodelist[result-x+1],nodelist,result-x+1);
+							}
+							else{
+								nodelist[result-x+1].className='clicked_mine';
+								alert('you lose!');
+								return false;
+							}
+						}
+						else{
+							nodelist[result-x+1].className='';
+						}
+					}	
+				}
+				if((result-x)>=0&&(result-1+x)%x!=x-1){
+					if(nodelist[result-x-1].className=='thunder'){
+						if((mark_num==mine_num)&&(mark_num!=0)){
+							if(Mine_list[result-x-1]==0){
+								nodelist[result-x-1].className='clicked_safe';
+								click_reaction(nodelist[result-x-1],nodelist,result-x-1);
+							}
+							else{
+								nodelist[result-x-1].className='clicked_mine';
+								alert('you lose!');
+								return false;
+							}
+						}
+						else{
+							nodelist[result-x-1].className='';
+						}
+					}	
+				}
+				if((result+x)<x*y&&(result+1)%x!=0){
+					if(nodelist[result+x+1].className=='thunder'){
+						if((mark_num==mine_num)&&(mark_num!=0)){
+							if(Mine_list[result+x+1]==0){
+								nodelist[result+x+1].className='clicked_safe';
+								click_reaction(nodelist[result+x+1],nodelist,result+x+1);
+							}
+							else{
+								nodelist[result+x+1].className='clicked_mine';
+								alert('you lose!');
+								return false;
+							}
+						}
+						else{
+							nodelist[result+x+1].className='';
+						}
+					}	
+				}
+				if((result+x)<x*y&&(result-1+x)%x!=x-1){
+					if(nodelist[result+x-1].className=='thunder'){
+						if((mark_num==mine_num)&&(mark_num!=0)){
+							if(Mine_list[result+x-1]==0){
+								nodelist[result+x-1].className='clicked_safe';
+								click_reaction(nodelist[result+x-1],nodelist,result+x-1);
+							}
+							else{
+								nodelist[result+x-1].className='clicked_mine';
+								alert('you lose!');
+								return false;
+							}
+						}
+						else{
+							nodelist[result+x-1].className='';
+						}
+					}	
+				}
+
+			}
+			if(num_thunder==0) alert('youwin');
+			flag=0;
+		});
+	}
+			}
+		)
+	}
+	
+}
+function click_reaction(el,nodelist,number=-1){
+	var result = 0 ;
+	var x=column,y=row;
+	var sum=x * y;
+	if(number!=-1){
+		for(var j =0;j<sum;j++){
+			if (nodelist[j]==el){
+				result= j;
+			}
+		}
+	}
+	else {
+		result = number;
+	}
+	if((result+1)%x!=0){
+		if(Mine_list[result+1]!=0)
+			return false;
+	}
+	if((result-1+x)%x!=x-1){
+		if(Mine_list[result-1]!=0)
+			return false;
+	}
+	if((result+x)<x*y){
+		if(Mine_list[result+x]!=0)
+			return false;
+	}
+	if((result-x)>=0){
+		if(Mine_list[result-x]!=0)
+			return false;
+	}
+	if((result-x)>=0&&(result+1)%x!=0){
+		if(Mine_list[result-x+1]!=0)
+			return false;
+	}
+	if((result-x)>=0&&(result-1+x)%x!=x-1){
+		if(Mine_list[result-x-1]!=0)
+			return false;
+	}
+	if((result+x)<x*y&&(result+1)%x!=0){
+		if(Mine_list[result+x+1]!=0)
+			return false;
+	}
+	if((result+x)<x*y&&(result-1+x)%x!=x-1){
+		if(Mine_list[result+x-1]!=0)
+			return false;
+	}
+	if((result+1)%x!=0){
+		if(nodelist[result+1].className==''){
+			nodelist[result+1].className='clicked_safe';
+			click_reaction(nodelist[result+1],nodelist,result+1);
+		}
+	}
+	if((result-1+x)%x!=x-1){
+		if(nodelist[result-1].className==''){
+			nodelist[result-1].className='clicked_safe';
+			click_reaction(nodelist[result-1],nodelist,result-1);
+		}		
+	}
+	if((result+x)<x*y){
+		if(nodelist[result+x].className==''){
+			nodelist[result+x].className='clicked_safe';
+			click_reaction(nodelist[result+x],nodelist,result+x);
+		}
+	}
+	if((result-x)>=0){
+		if(nodelist[result-x].className==''){
+			nodelist[result-x].className='clicked_safe';
+			click_reaction(nodelist[result-x],nodelist,result-x);
+		}
+	}
+	if((result-x)>=0&&(result+1)%x!=0){
+		if(nodelist[result-x+1].className==''){
+			nodelist[result-x+1].className='clicked_safe';
+			click_reaction(nodelist[result-x+1],nodelist,result-x+1);
+		}
+	}
+	if((result-x)>=0&&(result-1+x)%x!=x-1){
+		if(nodelist[result-x-1].className==''){
+			nodelist[result-x-1].className='clicked_safe';
+			click_reaction(nodelist[result-x-1],nodelist,result-x-1);
+		}
+	}
+	if((result+x)<x*y&&(result+1)%x!=0){
+		if(nodelist[result+x+1].className==''){
+			nodelist[result+x+1].className='clicked_safe';
+			click_reaction(nodelist[result+x+1],nodelist,result+x+1);
+		}
+	}
+	if((result+x)<x*y&&(result-1+x)%x!=x-1){
+		if(nodelist[result+x-1].className==''){
+			nodelist[result+x-1].className='clicked_safe';
+			click_reaction(nodelist[result+x-1],nodelist,result+x-1);
+		}
+	}
+}
+</script>
+</html>
