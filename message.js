@@ -1,1 +1,4 @@
-message(['test','crossdomain'])
+message([
+  {"id":"1", "title":"天津新闻联播，雷人搞笑的男主持人"},
+  {"id":"10", "title":"今天中国多地仍将出现中度霾"}
+]);
